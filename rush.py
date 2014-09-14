@@ -49,14 +49,18 @@ class board(object):
         row_start, column_start = block.coordinate
         if block.direction == "h":
             row_end == row_start + block.size
+            column_end == column_start + 1
         elif block.direction == "v":
             column_end == column_start + block_size
+            row_end = row_start + 1
         else:
             fail("Invalid Block direction. Valid inputs: h for ""horizontal"" and v for ""vertical"")
         #Deleting block from old grid:
             for i in range(0, self.size):
                 while block in grid[i]:
-                    pass #Fix this
+                    loc = grid[i].index(block)
+                    grid[i][loc] = 0
+
         #Creating new grid:
         for row in range(row_start, row_end):
             for column in range(column_start, column_end):
