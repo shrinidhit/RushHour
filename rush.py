@@ -44,7 +44,7 @@ class board(object):
         self.blocks.append(block)
     def create_grid(self):
         self.grid = numpy.zeros(shape=(self.size, self.size))
-    def update_grid(block):
+    def update_grid(self, block):
         #Getting block position
         row_start, column_start = block.coordinate
         if block.direction == "h":
