@@ -20,9 +20,9 @@ GRID_SIZE = 6
 class block(object):
     """Encodes state of block"""
     def __init__(self, coordinate, direction):
-        self.coordinate = coordinate
-        self.size = size
-        self.direction = direction
+        self.coordinate = coordinate # tuple
+        self.size = size # length of block
+        self.direction = direction # orientation of block
 
 class car(block):
     """Encodes state of car: 2 units long"""
@@ -38,10 +38,10 @@ class truck(block):
 
 class board(object):
     def __init__(self):
-        self.blocks = []
+        self.blocks = [] # create empty list of blocks on board
         self.size = GRID_SIZE
     def add_block(self, block):
-        self.blocks.append(block)
+        self.blocks.append(block) # add new block to board.blocks list
     def create_grid(self):
         self.grid = numpy.zeros(shape=(self.size, self.size))
     def update_grid(block):
