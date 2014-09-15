@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#
+# Shrinidhi Thirumalai and Allison Patterson
 # Game Programming, Level 1 Project
 #
 # RUSH HOUR
@@ -14,59 +14,74 @@ import numpy
 
 #Global Variables:
 GRID_SIZE = 6
+level1 = "A21dB31rC51dD61dE42dF63dI34rH45dX23r"
 
 #Classes
 
 class block(object):
     """Encodes state of block"""
-    def __init__(self, coordinate, direction):
+    def __init__(self, name, coordinate, direction):
+        self.name = name #name of block
         self.coordinate = coordinate # tuple
-        self.size = size # length of block
         self.direction = direction # orientation of block
 
 class car(block):
     """Encodes state of car: 2 units long"""
-    def __init__(self, coordinate, direction):
-        super(car, self).__init__()
+    def __init__(self, name, coordinate, direction):
+        super(car, self).__init__(name, coordinate, direction)
         self.size = 2
 
 class truck(block):
     """Encodes state of truck: 3 units long"""
-    def __init__(self, coordinate, direction):
-        super(truck, self).__init__()
+    def __init__(self, name, coordinate, direction):
+        super(truck, self).__init__(name, coordinate, direction)
         self.size = 3
 
 class board(object):
     def __init__(self):
-        self.blocks = [] # create empty list of blocks on board
+        self.blocks = [] # create empty list of blocks on board, and empty grid
         self.size = GRID_SIZE
-    def add_block(self, block):
-        self.blocks.append(block) # add new block to board.blocks list
-    def create_grid(self):
-        self.grid = numpy.zeros(shape=(self.size, self.size))
+        self.grid = [[0,0,0,0,0,0], [0,0,0,0,0,0], [0,0,0,0,0,0], [0,0,0,0,0,0], [0,0,0,0,0,0], [0,0,0,0,0,0]]
+
+        # row = []
+        # for i in range(0, GRID_SIZE):
+        #     row.append(0)
+        # for i in range(0, GRID_SIZE):
+        #     self.grid.append(row)
+
     def update_grid(self, block):
+
         #Getting block position
         row_start, column_start = block.coordinate
-        if block.direction == "h":
-            row_end == row_start + block.size
-            column_end == column_start + 1
-        elif block.direction == "v":
-            column_end == column_start + block_size
+        row_start = row_start - 1;
+        column_start = column_start - 1
+
+        if block.direction == "r":
+            row_end = row_start + block.size
+            column_end = column_start + 1
+        elif block.direction == "d":
+            column_end = column_start + block.size
             row_end = row_start + 1
         else:
-            fail("Invalid Block direction. Valid inputs: h for ""horizontal"" and v for ""vertical"")
-        #Deleting block from old grid:
-            for i in range(0, self.size):
-                while block in grid[i]:
-                    loc = grid[i].index(block)
-                    grid[i][loc] = 0
+            fail ("Invalid Block direction. Valid inputs: r for ""right"" and d for ""down""")
 
-        #Creating new grid:
+        #Deleting block from old grid:
+        for i in range(0, self.size):
+            while block in self.grid[i]:
+                loc = self.grid[i].index(block)
+                self.grid[i][loc] = 0
+
+        #Putting block in new position:
         for row in range(row_start, row_end):
             for column in range(column_start, column_end):
-                self.grid[row, column] = block
-
-
+                if self.grid[column][row] == 0:
+                    self.grid[column][row] = block
+                else:
+                    fail ("Blocks can not overlap")
+    def add_block(self, block):
+        # add new block to board.blocks list
+        self.blocks.append(block)
+        self.update_grid(block)
 
 # fail somewhat gracefully
 def fail (msg):
@@ -83,44 +98,64 @@ def validate_move (brd,move):
 
 
 def read_player_input (brd):
-    # FIX ME!
+    if validate_move(brd, move):
+        pass
+        #Returning (block, newcoordinate)
+    else:
+        fail ("Invalid move input. Try again")
     return None
 
 
 def update_board (brd,move):
     # FIX ME!
+    #Change coordinate of block in "move"
+    #Update Board
     return brd
 
 
 def print_board (brd):
     # FIX ME!
-    print "<some output of the board>"
+    brd = brd.grid
+    for row in brd:
+        for car in row:
+            if car == 0:
+                print "_",
+            else:
+                print car.name,
+        print ""
+    print ""
+
 
     
 def done (brd):
-    # FIX ME!
+    #Check if object X's coordinate is at end position. Return True if it is
     return True
 
+def string_to_object(object_string):
+    name = object_string[0]
+    coordinate = (int(object_string[1]), int(object_string[2]))
+    direction = object_string[3]
+    if name in ["X", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"]:
+        return car(name, coordinate, direction)
+    elif name in ["O", "P", "Q", "R"]:
+        return car(name, coordinate, direction)
+    else:
+        fail ("invalid car naming")
 
-# initial board:
-# Board positions (1-6,1-6), directions 'r' or 'd'
-#
-# X @ (2,3) r
-# A @ (2,4) r
-# B @ (2,5) d
-# C @ (3,6) r
-# O @ (4,3) d
-# P @ (6,4) d
-
-
-def create_initial_level ():
+def create_initial_level (level_string):
     # FIX ME!
-    return None
+    # initial board:
+    # Board positions (1-6,1-6), directions 'r' or 'd'
 
+    start_board = board()
+    for i in range(0, len(level_string), 4):
+        object_string = level_string[i:i+4]
+        start_board.add_block(string_to_object(object_string))
+    return start_board
 
 def main ():
 
-    brd = create_initial_level()
+    brd = create_initial_level(level1)
 
     print_board(brd)
 
@@ -130,14 +165,13 @@ def main ():
         print_board(brd)
 
     print 'YOU WIN! (Yay...)\n'
-        
+
+def test ():
+
+    brd = create_initial_level(level1)
+
+    print_board(brd)
 
 if __name__ == '__main__':
-    #test
-    testboard = board()
-    testboard.create_grid()
-    print testboard.grid
-    print row
-    print column
-
-    # main()
+    test()
+    #main()
