@@ -150,12 +150,12 @@ def read_player_input (brd, move):
             if grid[x][y] !=0:
                 fail ("Move is blocked by another piece")
 
-    return coordinate_new
+    return [block, coordinate_new]
 
 def update_board (brd,move):
-    # FIX ME!
-    #Change coordinate of block in "move"
-    #Update Board
+    [block, new_coordinate] = read_player_input(move)
+    block.coordinate = new_coordinate
+    
     return brd
 
 
@@ -175,7 +175,6 @@ def print_board (brd):
     
 def done (brd):
     #Check if object X's coordinate is at end position. Return True if it is
-
     return True
 
 def main ():
