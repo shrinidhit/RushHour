@@ -9,9 +9,6 @@
 # by Binary Arts Corp
 #
 
-#imports:
-import numpy
-
 #Global Variables:
 GRID_SIZE = 6
 level1 = "A21dB31rC51dD61dE42dF63dI34rH45dX23r" # initial coordinates of each block object (yikes!)
@@ -40,6 +37,7 @@ class truck(block):
 class board(object):
     def __init__(self):
         self.blocks = [] # create empty list of blocks on board, and empty grid
+        self.blocknames = []
         self.size = GRID_SIZE
         self.grid = [[0,0,0,0,0,0], [0,0,0,0,0,0], [0,0,0,0,0,0], [0,0,0,0,0,0], [0,0,0,0,0,0], [0,0,0,0,0,0]]
 
@@ -81,65 +79,78 @@ class board(object):
     def add_block(self, block):
         # add new block to board.blocks list
         self.blocks.append(block)
+        self.blocknames.append(block.name)
         self.update_grid(block)
+
 
 # fail somewhat gracefully
 def fail (msg):
     raise StandardError(msg)
 
+def name_to_object(brd, objectName):
+    index = brd.blocknames.index(objectName)
+    return brd.blocks[index]
 
-# def validate_move (brd,move): ##### Aaaaaaahhhhhhh... #####
-#     # FIX ME!  
-
-#     row_new, column_new = block.coordinate + block.move ##### I may have made this one up #####
-#     # check that piece is on the board
-#     for boardblock in board.blocks:
-#         if boardblock.name == 
-#     if block.name not in board.blocks:
-#         fail ("Block named does not exist on board")
-#     # check that piece would be in bound
-#     elif row_new < 0:
-#         fail ("Block can't go past the top edge of the board.")
-#     elif row_new > 5:
-#         fail ("Block can't go past the bottom edge of the board.")
-#     elif column_new < 0:
-#         fail ("Block can't go past the left edge of the board.")
-#     elif column_new > 5:
-#         fail ("Block can't go past the right edge of the board.")
-#     # check that piece placed so it can move in that direction
-#     elif block.direction != "r" or "d":
-#         fail ("Selected block cannot move in that direction.")
-#     # check that path to target position is free    
-#     elif row_new != 0:
-#         fail ("There is another block preventing that move.")
-#     elif column_new != 0:
-#         fail ("There is another block preventing that move.")
-#     else:
-#         return True
-
-
-def read_player_input (brd):
-    if validate_move(brd, move):
-        ##### assuming move is string like 'Au5' #####
-        for block in board.blocks:
-            if block.name == move[0]: # so the 'A' bit
-                if move[1] == 'u': # up
-                    coordinate_new = block.coordinate + (0, int(move[2]))
-                elif move[1] == 'd': # down
-                    coordinate_new = block.coordinate - (0, int(move[2]))
-                elif move[1] == 'l': # left
-                    coordinate_new = block.coordinate - (int(move[2]), 0)
-                elif move[1] == 'r': # right
-                    coordinate_new = block.coordinate + (int(move[2]), 0)
-            else:
-                fail ("Selected block is invalid.")
-        
-
-        #Returning (block, newcoordinate)
+def string_to_new_object(object_string):
+    name = object_string[0]
+    coordinate = (int(object_string[1]), int(object_string[2]))
+    direction = object_string[3]
+    if name in ["X", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"]:
+        return car(name, coordinate, direction)
+    elif name in ["O", "P", "Q", "R"]:
+        return truck(name, coordinate, direction)
     else:
-        fail ("Invalid move input. Try again.")
-    return None
+        fail ("invalid car naming")
 
+def create_initial_level (level_string):
+    # FIX ME!
+    # initial board:
+    # Board positions (1-6,1-6), directions 'r' or 'd'
+
+    start_board = board()
+    for i in range(0, len(level_string), 4):
+        object_string = level_string[i:i+4]
+        start_board.add_block(string_to_new_object(object_string))
+    return start_board
+
+def read_player_input (brd, move):
+    blockname = move[0]
+    direction = move[1]
+    amount = move[2]
+
+    #Checks if block is on board
+    if blockname in brd.blocknames:
+        block = name_to_object(brd, blockname)
+    else: fail ("Block is not on board")
+
+    #Checks if block can move in said direction
+    if direction in ["u", "d"] and block.direction != "d":
+        fail ("Invalid Block Direction")
+    if direction in ["r", "l"] and block.direction != "r":
+        fail ("Invalid Block Direction")
+
+    #Gets new coordinates
+    currentx, currenty = block.coordinate
+    if direction == 'u': # up
+        coordinate_new = (currentx, currenty + int(amount))
+    elif direction == 'd': # down
+        coordinate_new = (currentx, currenty - int(amount))
+    elif direction == 'l': # left
+        coordinate_new = (currentx + int(amount), currenty)
+    elif direction == 'r': # right
+        coordinate_new = (currentx - int(amount), currenty)
+
+    #Checks if new coordinate is within boundries
+    if 0 >= coordinate_new[0] or coordinate_new[0] >=5:
+        fail ("Move not in bounds")
+
+    #Checks if path to new coordinate is free:
+    for x in range(currentx, coordinate_new[0] + 1):
+        for y in range(currenty, coordinate_new[1] + 1):
+            if grid[x][y] !=0:
+                fail ("Move is blocked by another piece")
+
+    return coordinate_new
 
 def update_board (brd,move):
     # FIX ME!
@@ -158,35 +169,14 @@ def print_board (brd):
             else:
                 print car.name,
         print ""
-    print "" ##### do we need this line? #####
+    print "" ##### do we need this line? ##### <-----Yup, it adds an empty space after the whole grid is printed.
 
 
     
 def done (brd):
     #Check if object X's coordinate is at end position. Return True if it is
+
     return True
-
-def string_to_object(object_string):
-    name = object_string[0]
-    coordinate = (int(object_string[1]), int(object_string[2]))
-    direction = object_string[3]
-    if name in ["X", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"]:
-        return car(name, coordinate, direction)
-    elif name in ["O", "P", "Q", "R"]:
-        return car(name, coordinate, direction)
-    else:
-        fail ("invalid car naming")
-
-def create_initial_level (level_string):
-    # FIX ME!
-    # initial board:
-    # Board positions (1-6,1-6), directions 'r' or 'd'
-
-    start_board = board()
-    for i in range(0, len(level_string), 4):
-        object_string = level_string[i:i+4]
-        start_board.add_block(string_to_object(object_string))
-    return start_board
 
 def main ():
 
@@ -204,7 +194,6 @@ def main ():
 def test ():
 
     brd = create_initial_level(level1)
-
     print_board(brd)
 
 if __name__ == '__main__':
