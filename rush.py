@@ -118,10 +118,24 @@ def validate_move (brd,move): ##### Aaaaaaahhhhhhh... #####
 
 def read_player_input (brd):
     if validate_move(brd, move):
-        pass
+        ##### assuming move is string like 'Au5' #####
+        for block in board.blocks:
+            if block.name == move[0]: # so the 'A' bit
+                if move[1] == 'u': # up
+                    coordinate_new = block.coordinate + (0, int(move[2]))
+                elif move[1] == 'd': # down
+                    coordinate_new = block.coordinate - (0, int(move[2]))
+                elif move[1] == 'l': # left
+                    coordinate_new = block.coordinate - (int(move[2]), 0)
+                elif move[1] == 'r': # right
+                    coordinate_new = block.coordinate + (int(move[2]), 0)
+            else:
+                fail ("Selected block is invalid.")
+        
+
         #Returning (block, newcoordinate)
     else:
-        fail ("Invalid move input. Try again")
+        fail ("Invalid move input. Try again.")
     return None
 
 
