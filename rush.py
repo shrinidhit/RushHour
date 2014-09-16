@@ -90,29 +90,46 @@ def fail (msg):
 
 def validate_move (brd,move): ##### Aaaaaaahhhhhhh... #####
     # FIX ME!
-    row_new, column_new = block.coordinate + block.move ##### I may have made this one up #####
-    # check that piece is on the board
-    if block.name not in board.blocks:
-        fail ("Block named does not exist on board")
-    # check that piece would be in bound
-    elif row_new < 0:
-        fail ("Block can't go past the top edge of the board.")
-    elif row_new > 5:
-        fail ("Block can't go past the bottom edge of the board.")
-    elif column_new < 0:
-        fail ("Block can't go past the left edge of the board.")
-    elif column_new > 5:
-        fail ("Block can't go past the right edge of the board.")
-    # check that piece placed so it can move in that direction
-    elif block.direction != "r" or "d":
-        fail ("Selected block cannot move in that direction.")
-    # check that path to target position is free    
-    elif row_new != 0:
-        fail ("There is another block preventing that move.")
-    elif column_new != 0:
-        fail ("There is another block preventing that move.")
-    else:
-        return True
+
+    ##### assuming move is string like 'Au5' #####
+    block.name = move[0] # so the 'A' bit
+    if move[1] == 'u': # up
+        coordinate_new = block.coordinate + (0, move[2])
+    elif move[1] == 'd': # down
+        coordinate_new = block.coordinate - (0, move[2])
+    elif move[1] == 'l': # left
+        coordinate_new = block.coordinate - (move[2], 0)
+    elif move[1] == 'r': # right
+        coordinate_new = block.coordinate + (move[2], 0)
+    
+    
+
+
+
+
+    # row_new, column_new = block.coordinate + block.move ##### I may have made this one up #####
+    # # check that piece is on the board
+    # if block.name not in board.blocks:
+    #     fail ("Block named does not exist on board")
+    # # check that piece would be in bound
+    # elif row_new < 0:
+    #     fail ("Block can't go past the top edge of the board.")
+    # elif row_new > 5:
+    #     fail ("Block can't go past the bottom edge of the board.")
+    # elif column_new < 0:
+    #     fail ("Block can't go past the left edge of the board.")
+    # elif column_new > 5:
+    #     fail ("Block can't go past the right edge of the board.")
+    # # check that piece placed so it can move in that direction
+    # elif block.direction != "r" or "d":
+    #     fail ("Selected block cannot move in that direction.")
+    # # check that path to target position is free    
+    # elif row_new != 0:
+    #     fail ("There is another block preventing that move.")
+    # elif column_new != 0:
+    #     fail ("There is another block preventing that move.")
+    # else:
+    #     return True
 
 
 def read_player_input (brd):
