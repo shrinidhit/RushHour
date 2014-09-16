@@ -89,23 +89,7 @@ def fail (msg):
 
 
 def validate_move (brd,move): ##### Aaaaaaahhhhhhh... #####
-    # FIX ME!
-
-    ##### assuming move is string like 'Au5' #####
-    block.name = move[0] # so the 'A' bit
-    if move[1] == 'u': # up
-        coordinate_new = block.coordinate + (0, move[2])
-    elif move[1] == 'd': # down
-        coordinate_new = block.coordinate - (0, move[2])
-    elif move[1] == 'l': # left
-        coordinate_new = block.coordinate - (move[2], 0)
-    elif move[1] == 'r': # right
-        coordinate_new = block.coordinate + (move[2], 0)
-    
-    
-
-
-
+    # FIX ME!  
 
     # row_new, column_new = block.coordinate + block.move ##### I may have made this one up #####
     # # check that piece is on the board
