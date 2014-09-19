@@ -207,6 +207,20 @@ def main ():
 
     print 'YOU WIN! (Yay...)\n'
 
+def main_with_initial(level):
+
+    brd = create_initial_level(level)
+
+    print_board(brd)
+
+    while not done(brd):
+        playerinput = get_player_input()
+        move = read_player_input(brd, playerinput)
+        brd = update_board(brd,move)
+        print_board(brd)
+
+    print 'YOU WIN! (Yay...)\n'
+
 def test_input(moveString):
     brd = create_initial_level(level1)
 
@@ -231,5 +245,8 @@ def test ():
     print 'YOU WIN! (Yay...)\n'
 
 if __name__ == '__main__':
-    test()
-    #main()
+    import sys
+    if len(sys.argv) > 1:
+        main_with_initial (sys.argv[1])
+    else:
+        main()
