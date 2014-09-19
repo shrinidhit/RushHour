@@ -41,42 +41,38 @@ class board(object):
         self.size = GRID_SIZE
         self.grid = [[0,0,0,0,0,0], [0,0,0,0,0,0], [0,0,0,0,0,0], [0,0,0,0,0,0], [0,0,0,0,0,0], [0,0,0,0,0,0]]
 
-        # row = []
-        # for i in range(0, GRID_SIZE):
-        #     row.append(0)
-        # for i in range(0, GRID_SIZE):
-        #     self.grid.append(row)
     def add_block(self, block):
         # add new block to board.blocks list
         self.blocks.append(block)
         self.blocknames.append(block.name)
         self.update_grid(block)
+
     def grid_object(self, row, column):
-        return self.grid[row - 1][column -1]
-    def grid_assign(self, row, colunm, newitem):
-        self.grid[row - 1][colunm - 1] = newitem
+        return self.grid [row - 1][column -1]
+
+    def grid_assign(self, row, column, newitem):
+        self.grid[row - 1][column - 1] = newitem
 
     def update_grid(self, block):
-
         #Getting block position
         row_start, column_start = block.coordinate
         row_start = row_start
         column_start = column_start
 
-        if block.direction == "r":
+        if block.direction == "d":
             row_end = row_start + block.size
             column_end = column_start + 1
-        elif block.direction == "d":
+        elif block.direction == "r":
             column_end = column_start + block.size
             row_end = row_start + 1
         else:
             fail ("Invalid Block direction. Valid inputs: r for ""right"" and d for ""down""")
 
         #Deleting block from old grid:
-        for i in range(1, self.size + 1):
+        for i in range(0, self.size):
             while block in self.grid[i]:
                 loc = self.grid[i].index(block) + 1
-                self.brd.grid_assign(i, loc, 0)
+                self.grid_assign(i + 1, loc, 0)
 
         #Putting block in new position:
         for row in range(row_start, row_end):
@@ -97,7 +93,7 @@ def name_to_object(brd, objectName):
 
 def string_to_new_object(object_string):
     name = object_string[0]
-    coordinate = (int(object_string[1]), int(object_string[2]))
+    coordinate = (int(object_string[2]), int(object_string[1]))
     direction = object_string[3]
     if name in ["X", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"]:
         return car(name, coordinate, direction)
@@ -135,26 +131,30 @@ def read_player_input (brd, move):
     else: fail ("Block is not on board")
 
     #Checks if block can move in said direction
-    if direction in ["u", "d"] and block.direction != "d":
+    if direction in ["u", "d"] and block.direction == "r":
         fail ("Invalid Block Direction")
-    if direction in ["r", "l"] and block.direction != "r":
+    if direction in ["r", "l"] and block.direction == "d":
         fail ("Invalid Block Direction")
 
     #Gets new coordinates
     currentx, currenty = block.coordinate
-    print block.coordinate
     if direction == 'u': # up
-        coordinate_new = (currentx, currenty - int(amount))
-    elif direction == 'd': # down
-        coordinate_new = (currentx, currenty + int(amount))
-    elif direction == 'l': # left
         coordinate_new = (currentx - int(amount), currenty)
-    elif direction == 'r': # right
+    elif direction == 'd': # down
         coordinate_new = (currentx + int(amount), currenty)
+    elif direction == 'l': # left
+        coordinate_new = (currentx, currenty - int(amount))
+    elif direction == 'r': # right
+        coordinate_new = (currentx, currenty + int(amount))
 
     #Checks if new coordinate is within boundries
     if 1 > coordinate_new[0] or coordinate_new[0] > 6:
+        print coordinate_new
         fail ("Move not in bounds")
+    if 1 > coordinate_new[1] or coordinate_new[1] > 6:
+        print coordinate_new
+        fail ("Move not in bounds")
+
 
     #Checks if path to new coordinate is free:
     for x in range(currentx, coordinate_new[0] + 1):
@@ -163,6 +163,7 @@ def read_player_input (brd, move):
                 fail ("Move is blocked by another piece")
 
     return [blockname, coordinate_new]
+    
 
 def update_board (brd, blockname, coordinate_new):
     block = name_to_object(brd, blockname)
@@ -186,10 +187,9 @@ def done (brd):
     #Check if object X's coordinate is at end position. Return True if it is
     endpoint1 = brd.grid_object(3,5)
     endpoint2 = brd.grid_object(3,6)
-
-    if type(endpoint1) is block:
+    if type(endpoint1) is car:
         if endpoint1.name == 'X': return True
-    elif type(endpoint2) is block:
+    elif type(endpoint2) is car:
         if endpoint2.name == 'X': return True
     return False
 
@@ -206,6 +206,16 @@ def main ():
         print_board(brd)
 
     print 'YOU WIN! (Yay...)\n'
+
+def test_input(moveString):
+    brd = create_initial_level(level1)
+
+    print_board(brd)
+
+    move = read_player_input(brd, moveString)
+    brd = update_board(brd, move[0], move[1])
+    print_board(brd)
+
 
 def test ():
     brd = create_initial_level(level1)
