@@ -10,7 +10,7 @@
 #
 
 #Global Variables:
-import graphicsTest.py ##### I put the thingy at the bottom #####
+#from graphicsTest import * ##### I put the thingy at the bottom #####
 
 GRID_SIZE = 6
 level1 = "A21dB31rC51dD61dE42dF63dI34rH45dX23r" # initial coordinates of each block object (yikes!)
@@ -246,8 +246,8 @@ def test ():
 
     print 'YOU WIN! (Yay...)\n'
 
-def testing_graphics():
-    graphicsTest()
+#def testing_graphics():
+    #graphicsTest()
 
 if __name__ == '__main__':
     import sys
