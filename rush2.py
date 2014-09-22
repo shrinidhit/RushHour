@@ -49,17 +49,17 @@ class board(object):
         self.grid = [[0,0,0,0,0,0], [0,0,0,0,0,0], [0,0,0,0,0,0], [0,0,0,0,0,0], [0,0,0,0,0,0], [0,0,0,0,0,0]]
 
     def add_block(self, block):
-    '''add new block to board.blocks list'''
+        """add new block to board.blocks list"""
         self.blocks.append(block)
         self.blocknames.append(block.name)
         self.update_grid(block)
 
     def grid_object(self, row, column):
-    """Returns the object in a given grid row and column"""
+        """Returns the object in a given grid row and column"""
         return self.grid [row - 1][column -1]
 
     def grid_assign(self, row, column, newitem):
-    """Places given item into grid at given row and column"""
+        """Places given item into grid at given row and column"""
         self.grid[row - 1][column - 1] = newitem
 
     def update_grid(self, block):
@@ -364,52 +364,29 @@ def done (brd):
 
 def main ():
     """Main game loop - default level"""
-    #Initializes Display Window
-    Canvas = Display()
-    #Initializes and prints level
     brd = create_initial_level(level1)
-    Canvas.print_display(brd)
 
-    #Loop of game action per user action
+    print_board(brd)
+
     while not done(brd):
-        #Initializes and sets up click response
-        Point = Canvas.win.getMouse()
-        Canvas.win.setMouseHandler(Canvas.when_clicked(Point, brd))
-        #Getting Player Input through clicks and outputs a list representing the move:
-        #[blockname,direction, amount to move]
-        playerinput = click_to_move(brd, Canvas, Point)
-        #Converts the list representing the move to an actual move on the board
+        playerinput = get_player_input()
         move = read_player_input(brd, playerinput)
-        #Updates Board
         brd = update_board(brd,move[0], move[1])
-        #Displays the updated board
-        Canvas.print_display(brd)
+        print_board(brd)
 
     print 'YOU WIN! (Yay...)\n'
 
 def main_with_initial(level):
     """Main game loop with level input as a string"""
-    #Initializes Display Window
-    Canvas = Display()
-    #Initializes and prints level
     brd = create_initial_level(level)
-    Canvas.print_display(brd)
 
-    #Loop of game action per user action
+    print_board(brd)
+
     while not done(brd):
-        #Initializes and sets up click response
-        Point = Canvas.win.getMouse()
-        Canvas.win.setMouseHandler(Canvas.when_clicked(Point, brd))
-        #Getting Player Input through clicks and outputs a list representing the move:
-        #[blockname,direction, amount to move]
-        playerinput = click_to_move(brd, Canvas, Point)
-        #Converts the list representing the move to an actual move on the board
+        playerinput = get_player_input()
         move = read_player_input(brd, playerinput)
-        #Updates Board
         brd = update_board(brd,move[0], move[1])
-        #Displays the updated board
-        Canvas.print_display(brd)
-
+        print_board(brd)
     print 'YOU WIN! (Yay...)\n'
 
 
