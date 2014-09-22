@@ -10,8 +10,6 @@
 #
 
 #Global Variables:
-#from graphicsTest import * ##### I put the thingy at the bottom #####
-
 GRID_SIZE = 6
 level1 = "A21dB31rC51dD61dE42dF63dI34rH45dX23r" # initial coordinates of each block object (yikes!)
 
@@ -83,7 +81,39 @@ class board(object):
                     self.grid_assign(row,column, block)
                 else:
                     fail ("Blocks can not overlap")
+# class canvas(object):
+#     def __init__(self):
+#         pass
 
+#     def draw_object (gridCanvas, object):
+#         pass
+
+#     def draw_canvas (brd):
+#         pass
+
+#     def remove_object (gridCanvas, object):
+#         pass
+
+#     def update_canvas (gridCanvas, block):
+#         #Getting block position
+#         row_start, column_start = block.coordinate
+#         row_start = row_start
+#         column_start = column_start
+
+#         if block.direction == "d":
+#             row_end = row_start + block.size
+#             column_end = column_start + 1
+#         elif block.direction == "r":
+#             column_end = column_start + block.size
+#             row_end = row_start + 1
+#         else:
+#             fail ("Invalid Block direction. Valid inputs: r for ""right"" and d for ""down""")
+
+#         #Deleting block from old grid:
+#         remove_object(gridCanvas, block)
+
+#         #Putting block in new position:
+#         draw_object(gridCanvas, block)
 
 # fail somewhat gracefully
 def fail (msg):
@@ -170,7 +200,7 @@ def read_player_input (brd, move):
 def update_board (brd, blockname, coordinate_new):
     block = name_to_object(brd, blockname)
     block.coordinate = coordinate_new
-    brd.update_grid(block)
+    brd.canvas.update_grid(block)
     return brd
 
 def print_board (brd):
@@ -184,7 +214,7 @@ def print_board (brd):
                 print car.name,
         print ""
     print "" ##### do we need this line? ##### <-----Yup, it adds an empty space after the whole grid is printed.
-    
+
 def done (brd):
     #Check if object X's coordinate is at end position. Return True if it is
     endpoint1 = brd.grid_object(3,5)
@@ -213,13 +243,13 @@ def main_with_initial(level):
 
     brd = create_initial_level(level)
 
-    print_board(brd)
+    draw_canvas(brd)
 
     while not done(brd):
         playerinput = get_player_input()
         move = read_player_input(brd, playerinput)
         brd = update_board(brd,move)
-        print_board(brd)
+        draw_canvas(brd)
 
     print 'YOU WIN! (Yay...)\n'
 
@@ -245,9 +275,6 @@ def test ():
         print_board(brd)
 
     print 'YOU WIN! (Yay...)\n'
-
-#def testing_graphics():
-    #graphicsTest()
 
 if __name__ == '__main__':
     import sys

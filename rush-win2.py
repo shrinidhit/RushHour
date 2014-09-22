@@ -12,6 +12,10 @@
 #Global Variables:
 #from graphicsTest import * ##### I put the thingy at the bottom #####
 
+#Imports
+from graphics import *
+
+#Global Variables
 GRID_SIZE = 6
 level1 = "A21dB31rC51dD61dE42dF63dI34rH45dX23r" # initial coordinates of each block object (yikes!)
 
@@ -84,6 +88,97 @@ class board(object):
                 else:
                     fail ("Blocks can not overlap")
 
+class Display(object):
+    """docstring for Display"""
+
+    def __init__(self):
+        # Initializations of Attributes:
+        self.pieceMap = {} #dictionary of 
+        self.coordMap =  {} # dictionary of coordinate pairs mapping to respective rectangles
+        self.rectangles = []
+        self.win = GraphWin("graphicsTest", 600, 600) # names & sizes window (pixels)
+        self.win.setCoords( 0, 8, 8, 0 ) # makes coordinates un-ugly (the rectangle in (row1, column1) will have its top left-hand corner in (1,1), rectangle in (row3, column5) will have (3,5), etc.)
+        self.selected = [1,1]
+        self.highlight = Rectangle(Point(self.selected[0],self.selected[1]), Point(self.selected[0] + 1,self.selected[1] + 1))
+        self.highlight.draw(self.win)
+        
+        # marks exit/goal w/ red line
+        ln = Line(Point(7,3), Point(7,4))
+        ln.setOutline('red')
+        ln.setWidth(5)
+        ln.draw(self.win)
+            
+        # draws empty rectangles/board
+        for i in range(1,7):
+            for j in range(1,7):
+                coord = (i,j) # coord of rectangle's top left-hand corner
+                rect = Rectangle(Point(i,j), Point(i+1,j+1))
+                self.coordMap[coord] = rect # ads coord:rect to dictionary (yay!)
+                rect.draw(self.win)
+
+
+    def display_object(self, block):
+        self.pieceMap[block.coordinate] = block
+        spaces = block.size
+        topLefty, topLeftx = block.coordinate
+        if block.direction == 'd':
+            piece = Rectangle(Point(topLeftx,topLefty), Point(topLeftx+1,topLefty+spaces))
+        elif block.direction == 'r':
+            piece = Rectangle(Point(topLeftx,topLefty), Point(topLeftx+spaces,topLefty+1))
+        piece.setFill('red')
+        piece.setOutline('white')
+        piece.setWidth(2)
+        piece.draw(self.win)
+        self.rectangles.append(piece)
+
+    def update_blocks(self, board):
+        blocklist = board.blocks
+        self.pieceMap = {}
+        for block in blocklist:
+            self.pieceMap[block.coordinate] = block
+
+    def show_highlight(self):
+        self.highlight.undraw()
+        self.highlight = Rectangle(Point(self.selected[0],self.selected[1]), Point(self.selected[0] + 1,self.selected[1] + 1))
+        self.highlight.draw(self.win)
+        self.highlight.setFill('black')
+
+    def print_display(self, board):
+        for rect in self.rectangles:
+            rect.undraw()
+
+        self.update_blocks(board)
+        for block in board.blocks:
+            self.display_object(block)
+        self.show_highlight()
+
+    def extract_coord(self, point):
+        x = point.getX()
+        y = point.getY()
+        xindex = int(x)#rounds value
+        yindex = int(y)
+        return (xindex, yindex)
+
+    def click_to_block(self, point, board):
+        #Getting indexes
+        index = self.extract_coord(point)
+        column, row = index
+        #Selecting piece
+        piece = self.coordMap[index]
+        self.selected = [column, row]
+        print self.pieceMap
+        print index
+        if type(board.grid_object(row, column)) != int:
+            block = board.grid_object(row, column)
+            return block
+
+    def when_clicked(self, point, board):
+        block = self.click_to_block(point, board)
+        return block
+
+    def test(self):
+        car1 = car('A', (2,2), 'd')
+        self.display_object(car1)
 
 # fail somewhat gracefully
 def fail (msg):
@@ -119,10 +214,55 @@ def get_player_input():
     move=raw_input('Enter your move(example: Au2) :')
     return move
 
+def string_to_move(string):
+    blockname = string[0]
+    direction = string[1]
+    amount = int(string[2])
+    return [blockname, direction, amount]
+
+def get_next_click(Display):
+    secondclick = Display.win.getMouse()
+    #Getting indexes
+    index = Display.extract_coord(point)
+    column, row = index
+    #Selecting piece
+    piece = Display.coordMap[index]
+    Display.selected = [column, row]
+    return index
+
+def click_to_move(brd, Display, point):
+    #name
+    block = Display.click_to_block(point, brd)
+    print "block selected",
+    blockname = block.name
+    print blockname
+    row, column = block.coordinate
+    secondindex = get_next_click(Display)
+    #Direction and amount
+    endcolumn, endrow = secondindex
+    if column == endcolumn and endrow > row:
+        direction = 'd'
+        amount = endrow - row
+    elif column == endcolumn and endrow < row:
+        direction = 'u'
+        amount = row - endrow
+    elif row == endrow and endcolumn > column:
+        direction = 'r'
+        amount = endcolumn - column
+    elif row == endrow and endcolumn < column:
+        direction = 'l'
+        amount = column - endcolumn
+    else:
+        fail('invalid direction')
+    print direction,
+    print amount
+    return [blockname, direction, amount]
+
 def read_player_input (brd, move):
+    move = string_to_move(move)
     blockname = move[0]
     direction = move[1]
-    amount = int(move[2])
+    amount = move[2]
 
     #Checks if block is on board
     if blockname in brd.blocknames:
@@ -196,16 +336,20 @@ def done (brd):
     return False
 
 def main ():
-
+    Canvas = Display()
     brd = create_initial_level(level1)
-
-    print_board(brd)
+    Canvas.print_display(brd)
+    Canvas.win.getMouse()
 
     while not done(brd):
-        playerinput = get_player_input()
+        #Getting Click
+        Point = Canvas.win.getMouse()
+        Canvas.win.setMouseHandler(Canvas.when_clicked(Point, brd))
+        #Getting Player Input
+        playerinput = click_to_move(brd, Canvas, Point)
         move = read_player_input(brd, playerinput)
         brd = update_board(brd,move[0], move[1])
-        print_board(brd)
+        Canvas.print_display(brd)
 
     print 'YOU WIN! (Yay...)\n'
 
@@ -231,20 +375,6 @@ def test_input(moveString):
     move = read_player_input(brd, moveString)
     brd = update_board(brd, move[0], move[1])
     print_board(brd)
-
-
-def test ():
-    brd = create_initial_level(level1)
-
-    print_board(brd)
-
-    while not done(brd):
-        moveString = get_player_input()
-        move = read_player_input(brd, moveString)
-        brd = update_board(brd, move[0], move[1])
-        print_board(brd)
-
-    print 'YOU WIN! (Yay...)\n'
 
 #def testing_graphics():
     #graphicsTest()
