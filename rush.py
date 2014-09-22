@@ -10,7 +10,7 @@
 #
 
 #Global Variables:
-#from graphicsTest import * ##### I put the thingy at the bottom #####
+#from graphicsTest import *
 
 GRID_SIZE = 6
 level1 = "A21dB31rC51dD61dE42dF63dI34rH45dX23r" # initial coordinates of each block object (yikes!)
@@ -48,6 +48,7 @@ class board(object):
         self.blocks.append(block)
         self.blocknames.append(block.name)
         self.update_grid(block)
+        return self.blocks
 
     def grid_object(self, row, column):
         return self.grid [row - 1][column -1]
@@ -56,24 +57,26 @@ class board(object):
         self.grid[row - 1][column - 1] = newitem
 
     def update_grid(self, block):
-        #Getting block position
+        # Getting block position
         row_start, column_start = block.coordinate
-        row_start = row_start
+        row_start = row_start ##### is this necessary? #####
         column_start = column_start
 
-        if block.direction == "d":
-            row_end = row_start + block.size
-            column_end = column_start + 1
-        elif block.direction == "r":
-            column_end = column_start + block.size
-            row_end = row_start + 1
-        else:
-            fail ("Invalid Block direction. Valid inputs: r for ""right"" and d for ""down""")
+
+
+        # if block.direction == "d":
+        #     row_end = row_start + block.size
+        #     column_end = column_start + 1
+        # elif block.direction == "r":
+        #     column_end = column_start + block.size
+        #     row_end = row_start + 1
+        # else:
+        #     fail ("Invalid Block direction. Valid inputs: r for ""right"" and d for ""down""")
 
         #Deleting block from old grid:
         for i in range(0, self.size):
-            while block in self.grid[i]:
-                loc = self.grid[i].index(block) + 1
+            while block in pieceMap[i]:
+                loc = pieceMap[i].index(block) + 1
                 self.grid_assign(i + 1, loc, 0)
 
         #Putting block in new position:
@@ -102,18 +105,20 @@ def string_to_new_object(object_string):
     elif name in ["O", "P", "Q", "R"]:
         return truck(name, coordinate, direction)
     else:
-        fail ("invalid car naming")
+        fail ("invalid piece name")
 
 def create_initial_level (level_string):
     # FIX ME!
     # initial board:
     # Board positions (1-6,1-6), directions 'r' or 'd'
 
-    start_board = board()
+    #start_board = board()
     for i in range(0, len(level_string), 4):
         object_string = level_string[i:i+4]
-        start_board.add_block(string_to_new_object(object_string))
-    return start_board
+        piece = string_to_new_object(object_string)
+        pieceMap[piece.coordinate] = piece
+    return pieceMap
+    # return start_board.blocks
 
 def get_player_input():
     move=raw_input('Enter your move(example: Au2) :')
@@ -173,17 +178,21 @@ def update_board (brd, blockname, coordinate_new):
     brd.update_grid(block)
     return brd
 
-def print_board (brd):
-    # FIX ME!
-    brd = brd.grid
-    for row in brd:
-        for car in row:
-            if car == 0:
-                print "_",
-            else:
-                print car.name,
-        print ""
-    print "" ##### do we need this line? ##### <-----Yup, it adds an empty space after the whole grid is printed.
+def print_board ():
+    create_board()
+    for i in start_board.blocks:
+        display_object(i)
+
+#     # FIX ME!
+#     brd = brd.grid
+#     for row in brd:
+#         for car in row:
+#             if car == 0:
+#                 print "_",
+#             else:
+#                 print car.name,
+#         print ""
+#     print "" ##### do we need this line? ##### <-----Yup, it adds an empty space after the whole grid is printed.
     
 def done (brd):
     #Check if object X's coordinate is at end position. Return True if it is
@@ -199,7 +208,7 @@ def main ():
 
     brd = create_initial_level(level1)
 
-    print_board(brd)
+    print_board()
 
     while not done(brd):
         playerinput = get_player_input()
@@ -213,36 +222,36 @@ def main_with_initial(level):
 
     brd = create_initial_level(level)
 
-    print_board(brd)
+    print_board()
 
     while not done(brd):
         playerinput = get_player_input()
         move = read_player_input(brd, playerinput)
         brd = update_board(brd,move)
-        print_board(brd)
+        print_board()
 
     print 'YOU WIN! (Yay...)\n'
 
 def test_input(moveString):
     brd = create_initial_level(level1)
 
-    print_board(brd)
+    print_board()
 
     move = read_player_input(brd, moveString)
     brd = update_board(brd, move[0], move[1])
-    print_board(brd)
+    print_board()
 
 
 def test ():
     brd = create_initial_level(level1)
 
-    print_board(brd)
+    print_board()
 
     while not done(brd):
         moveString = get_player_input()
         move = read_player_input(brd, moveString)
         brd = update_board(brd, move[0], move[1])
-        print_board(brd)
+        print_board()
 
     print 'YOU WIN! (Yay...)\n'
 
