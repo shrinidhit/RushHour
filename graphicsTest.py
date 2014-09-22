@@ -33,11 +33,18 @@ def display_object(block):
     spaces = block.size
     topLefty, topLeftx = block.coordinate
     if block.direction == 'd':
-        piece = Rectangle(Point(topLeftx,topLefty), Point(topLeftx+1,topLefty+spaces))
+        piece = Rectangle(Point(topLefty,topLeftx), Point(topLefty+1,topLeftx+spaces))
         pieceMap[block.coordinate] = piece
     elif block.direction == 'r':
-        piece = Rectangle(Point(topLeftx,topLefty), Point(topLeftx+spaces,topLefty+1))
-    piece.setFill('red')
+        piece = Rectangle(Point(topLefty,topLeftx), Point(topLefty+spaces,topLeftx+1))
+    
+    if block.name == 'X':
+        piece.setFill('red')
+    else:
+        if spaces == 2:
+            piece.setFill('blue')
+        elif spaces == 3:
+            piece.setFill('green')
     piece.setOutline('white')
     piece.setWidth(2)
     piece.draw(win)
@@ -69,10 +76,15 @@ def display_object(block):
     # piece.setFill('red')
 
 
-    win.getMouse() # Pause to view result
-    win.close()    # Close window when done
+    # win.getMouse() # Pause to view result
+    # win.close()    # Close window when done
         
 
 car1 = car('A', (2,2), 'd')
+car2 = car('X', (3,4), 'r')
 create_board()
 display_object(car1)
+display_object(car2)
+
+win.getMouse() # Pause to view result
+win.close()    # Close window when done
